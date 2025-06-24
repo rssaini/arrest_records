@@ -1,0 +1,28 @@
+.status-badge {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+.status-badge:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+/*
+
+.btn-gradient {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+}
+.btn-gradient:hover {
+    background: linear-gradient(45deg, #764ba2, #667eea);
+    color: white;
+    transform: translateY(-1px);
+}
+    */
+.table-hover tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+}
