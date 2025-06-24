@@ -165,8 +165,7 @@ async function getData(){
         }
     })
     .catch(function (error) {
-        // handle error
-        console.log(error);
+        setTimeout(getData, 30000);
     })
     .finally(function () {
         // always executed

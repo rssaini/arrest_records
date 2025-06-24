@@ -270,15 +270,16 @@ async function getData(){
                 worker_id: worker_id
             }).then(response => {
                 loopTest();
-            }).catch(error => {}).finally(() => {});
+            }).catch(error => {
+                setTimeout(getData, 30000);
+            }).finally(() => {});
         }
     })
     .catch(function (error) {
-        // handle error
-        console.log(error);
+        setTimeout(getData, 30000);
     })
     .finally(function () {
-        // always executed
+        
     });
 }
 
