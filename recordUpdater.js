@@ -79,7 +79,6 @@ class RecordUpdater {
             if (arrest_datetime !== undefined && arrest_datetime !== null) {
                 updates.push('arrest_datetime = ?');
                 params.push(arrest_datetime);
-                console.log(arrest_datetime);
             }
             if (status !== undefined) {
                 updates.push('status = ?');

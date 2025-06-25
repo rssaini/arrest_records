@@ -6,6 +6,13 @@ const RecordUpdater = require('./recordUpdater');
 const dbPath = path.join(__dirname, '/database/arrest_records.db')
 const base_url = 'http://localhost:3000/';
 const worker_id = 'W002';
+const LOGGER = false;
+
+const LOG = (message, msg1 = '', msg2 = '') => {
+    if(LOGGER){
+        console.log(message, msg1, msg2);
+    }
+};
 
 const updater = new RecordUpdater(dbPath);
 
@@ -45,14 +52,18 @@ const waitUntil = async page => {
             });
             
             if (h2Text) {
-                console.log('In Break: ', h2Text);
+                LOG('In Break: ', h2Text);
                 break;
             } else {
-                console.log('waiting for page load and verification clear');
+                LOG('waiting for page load and verification clear');
                 await sleep(2000);
             }
         }catch(err){
-            console.log('Exception', err);
+            if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+                LOG('Page or browser was closed unexpectedly.');
+                process.exit();
+            }
+            LOG('Exception', err);
             await sleep(2000);
         }
     }
@@ -63,6 +74,11 @@ const gotoPage = async(page, url) => {
         await page.goto(url, { waitUntil: "domcontentloaded" });
         await waitUntil(page);
     }catch(err){
+        if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+            LOG('Page or browser was closed unexpectedly.');
+            process.exit();
+        }
+        LOG(err);
         await gotoPage(page, url);
     }
 };
@@ -102,6 +118,11 @@ const getInfo = async(page) => {
         });
         return info;
     } catch(err){
+        if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+            LOG('Page or browser was closed unexpectedly.');
+            process.exit();
+        }
+        LOG(err);
         await sleep(2000);
         return getInfo(page);
     }
@@ -109,7 +130,7 @@ const getInfo = async(page) => {
 const criminalData = async(page, url, recordId) => {
     await gotoPage(page, url);
     const info = await getInfo(page);
-    console.log(info);
+    LOG(info);
     try {
         await updater.updateRecord({
             id: recordId,
@@ -140,7 +161,7 @@ async function test() {
         ignoreAllFlags: false,
         plugins: [pxp()],
     });
-    console.log('Total Records: ', criminalsArray.length);
+    LOG('Total Records: ', criminalsArray.length);
     for (const criminal of criminalsArray) {
         await criminalData(page, criminal.url, criminal.id);
     }
@@ -157,6 +178,7 @@ async function getData(){
             const data = response.data;
             if(data == '' || data == undefined){
                 setTimeout(getData, 5000);
+                return;
             }
             if(data.length > 0){
                 criminalsArray = data;
@@ -165,6 +187,7 @@ async function getData(){
         }
     })
     .catch(function (error) {
+        LOG(error);
         setTimeout(getData, 30000);
     })
     .finally(function () {
@@ -173,5 +196,5 @@ async function getData(){
 }
 
 getData();
-
+LOG("Bg Script Started");
 // p Verify you are human by completing the action below.

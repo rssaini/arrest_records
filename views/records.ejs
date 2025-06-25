@@ -109,6 +109,14 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Status</option>
+                            <option <%= filters.status == 'pending' ? 'selected' : '' %> value="pending">Pending</option>
+                            <option <%= filters.status == 'completed' ? 'selected' : '' %> value="completed">Processed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
                         <label for="charge_id" class="form-label">Charge</label>
                         <select class="form-select" id="charge_id" name="charge_id">
                             <option value="">All Charges</option>
@@ -203,14 +211,13 @@
                                                 </td>
                                                 <td><%= record.state_name %></td>
                                                 <td>
+                                                    <span onclick="toggleStatus(<%= record.id %>,'<%= record.status %>', this)" class="ml-2 badge bg-<%= record.status == 'pending' ? 'info' : 'success' %>"><%= record.status %></span>&nbsp;&nbsp;
                                                     <% if (record.url) { %>
                                                         <a href="<%= record.url %>" 
                                                            target="_blank" 
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="fas fa-external-link-alt"></i> View
                                                         </a>
-                                                    <% } else { %>
-                                                        <span class="text-muted">No URL</span>
                                                     <% } %>
                                                 </td>
                                             </tr>
@@ -226,7 +233,28 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        function toggleStatus(id, status, span){
+            let addclassName = 'bg-info';
+            let removeclassName = 'bg-success';
+            if(status == 'pending'){
+                addclassName = 'bg-success';
+                removeclassName = 'bg-info';
+                status = 'completed';
+            }else{
+                addclassName = 'bg-info';
+                removeclassName = 'bg-success';
+                status = 'pending';
+            }
+            $.get(`/api/records/status-update?id=${id}&status=${status}`).done(function(data){
+                if(data.status == 'success'){
+                    $(span).attr('onclick', `toggleStatus(${id},'${status}', this)`).removeClass(removeclassName).addClass(addclassName).text(status);
+                }
+            }).fail(function(err){
+                console.log(err);
+            });
+        }
         // Export CSV function
         function exportCSV() {
             const form = document.getElementById('filtersForm');

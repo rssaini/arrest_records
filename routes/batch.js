@@ -55,7 +55,7 @@ router.get('/stats', (req, res) => {
 
 // GET /api/batches - Get all batches with optional search
 router.get('/pending', (req, res) => {
-    let query = "SELECT * FROM batch WHERE 1=1 AND status LIKE 'active' AND script_status IN ('pending', 'processing') ORDER BY id LIMIT 1";
+    let query = "SELECT * FROM batch WHERE 1=1 AND status LIKE 'active' AND script_status IN ('pending', 'processing') AND start_time <>'' ORDER BY id LIMIT 1";
     let params = [];
     db.all(query, params, (err, rows) => {
         if (err) {
@@ -65,6 +65,21 @@ router.get('/pending', (req, res) => {
             });
         }
         res.json(rows[0]);
+    });
+});
+
+// GET /api/batches - Get all batches with optional search
+router.get('/pending_everyday', (req, res) => {
+    let query = "SELECT * FROM batch WHERE status LIKE 'active' AND start_time='' ORDER BY id";
+    let params = [];
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ 
+                error: 'Database error', 
+                details: err.message 
+            });
+        }
+        res.json(rows);
     });
 });
 
@@ -79,18 +94,18 @@ router.get('/', (req, res) => {
         limit = 10 
     } = req.query;
 
-    let query = 'SELECT * FROM batch WHERE 1=1';
+    let query = 'SELECT b.*, COUNT(r.id) AS total_records FROM batch b LEFT JOIN records r ON r.batch_id=b.id WHERE 1=1';
     let params = [];
 
     // Search functionality
     if (search) {
         query += ` AND (
-            id LIKE ? OR 
-            start_time LIKE ? OR 
-            end_time LIKE ? OR 
-            status LIKE ? OR 
-            script_status LIKE ? OR
-            processing_date LIKE ?
+            b.id LIKE ? OR 
+            b.start_time LIKE ? OR 
+            b.end_time LIKE ? OR 
+            b.status LIKE ? OR 
+            b.script_status LIKE ? OR
+            b.processing_date LIKE ?
         )`;
         const searchPattern = `%${search}%`;
         params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
@@ -98,28 +113,29 @@ router.get('/', (req, res) => {
 
     // Filter by status
     if (status) {
-        query += ' AND status = ?';
+        query += ' AND b.status = ?';
         params.push(status);
     }
 
     // Filter by script_status
     if (script_status) {
-        query += ' AND script_status = ?';
+        query += ' AND b.script_status = ?';
         params.push(script_status);
     }
 
     // Filter by worker_id
     if (worker_id) {
-        query += ' AND worker_id = ?';
+        query += ' AND b.worker_id = ?';
         params.push(worker_id);
     }
 
     // Order by id descending
-    query += ' ORDER BY id DESC';
+    query += ' GROUP BY b.id HAVING COUNT(r.id) >= 0 ORDER BY b.id DESC';
 
     // Pagination
     const offset = (page - 1) * limit;
     query += ' LIMIT ? OFFSET ?';
+
     params.push(parseInt(limit), offset);
 
     db.all(query, params, (err, rows) => {

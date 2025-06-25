@@ -54,6 +54,23 @@ router.get('/api/records', async (req, res) => {
     }
 });
 
+router.get('/api/records/status-update', async (req, res) => {
+    db.run(
+        'UPDATE records SET status = ? WHERE id = ?',
+        [req.query.status, req.query.id],
+        function(err) {
+            if (err) {
+                console.error('Error updating status:', err.message);
+                res.status(500).json({ error: 'Failed to update status' });
+            } else if (this.changes === 0) {
+                res.status(404).json({ error: 'State not found' });
+            } else {
+                res.json({ message: 'Status updated successfully', status: 'success' });
+            }
+        }
+    );
+});
+
 // Records Page
 router.get('/records', async (req, res) => {
     try {
@@ -90,6 +107,10 @@ router.get('/records', async (req, res) => {
         if (req.query.county_id) {
             query += ' AND r.county_id = ?';
             params.push(req.query.county_id);
+        }
+        if (req.query.status) {
+            query += ' AND r.status = ?';
+            params.push(req.query.status);
         }
         
         if (req.query.charge_id) {

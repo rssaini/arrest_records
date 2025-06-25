@@ -279,6 +279,231 @@
     color: white;
 }
     </style>
+    <style>
+        .dashboard-main .stats-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-main .stats-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-main .stats-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dashboard-main .stats-card:hover::after {
+            opacity: 1;
+        }
+
+        .dashboard-main .card-total {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .dashboard-main .card-completed {
+            background: linear-gradient(135deg, #059669 0%, #10d876 100%);
+            color: white;
+        }
+
+        .dashboard-main .card-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            color: white;
+        }
+
+        .dashboard-main .card-body {
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dashboard-main .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-main .card-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-main .card-icon {
+            font-size: 3rem;
+            opacity: 0.2;
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dashboard-main .card-percentage {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-main .percentage-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .dashboard-main .percentage-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            transition: width 2s ease-in-out;
+        }
+
+        .dashboard-main .dashboard-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-main .stats-card {
+            animation: countUp 0.6s ease-out forwards;
+        }
+
+        .dashboard-main .stats-card:nth-child(1) { animation-delay: 0.1s; }
+        .dashboard-main .stats-card:nth-child(2) { animation-delay: 0.2s; }
+        .dashboard-main .stats-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .dashboard-main .card-script {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .dashboard-main .card-script.stopped {
+            background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+            color: white;
+        }
+
+        .dashboard-main .status-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .dashboard-main .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            flex-shrink: 0;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .dashboard-main .status-indicator.running {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .dashboard-main .status-indicator.stopped {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            animation: none;
+        }
+
+        .dashboard-main .toggle-btn {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .dashboard-main .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .dashboard-main .toggle-btn:active {
+            transform: translateY(0);
+        }
+
+        .dashboard-main .toggle-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dashboard-main .toggle-btn:disabled:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .dashboard-main .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .dashboard-main .script-control-card {
+            transition: all 0.5s ease;
+        }
+
+        .dashboard-main .script-control-card.card-script {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .dashboard-main .script-control-card.card-script.stopped {
+            background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -301,35 +526,87 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white">
+    <div class="dashboard-main container mt-4">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="card stats-card card-total">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
                                 <h5 class="card-title">Total Records</h5>
-                                <h2 id="totalRecords"><%= totalRecords.toLocaleString() %></h2>
-                            </div>
-                            <div class="align-self-center">
-                                <i class="fas fa-database fa-2x"></i>
+                                <h2 class="card-number" id="totalRecords">0</h2>
+                                <div class="card-percentage">
+                                    <small>Database entries</small>
+                                </div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 100%"></div>
+                                </div>
                             </div>
                         </div>
+                        <i class="fas fa-database card-icon"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-info-circle"></i> System Info
-                        </h5>
-                    </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card stats-card card-completed">
                     <div class="card-body">
-                        <p><strong>Database:</strong> SQLite</p>
-                        <p><strong>Last Update:</strong> <span id="lastUpdate"><%= new Date().toLocaleString() %></span></p>
-                        <p><strong>Script Status:</strong> <button data-status="stopped" id="toggleBtn" class="btn btn-status inactive"><i class="fas fa-stop"></i> Stopped</button></p>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Completed Records</h5>
+                                <h2 class="card-number" id="completedRecords">0</h2>
+                                <div class="card-percentage">
+                                    <small><span id="completedPercentage">0</span>% completion rate</small>
+                                </div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" id="completedBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle card-icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card stats-card card-pending">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Pending Records</h5>
+                                <h2 class="card-number" id="pendingRecords">0</h2>
+                                <div class="card-percentage">
+                                    <small><span id="pendingPercentage">0</span>% remaining</small>
+                                </div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" id="pendingBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-clock card-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card stats-card script-control-card" id="scriptCard">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title"><div class="status-indicator" id="statusIndicator"></div>Script <span id="statusText">Running</span></h5>
+                                <h2 class="card-number"><button class="btn toggle-btn mb-2" id="toggleBtn" onclick="toggleScript()">
+                                    <i class="fas fa-stop me-1"></i>
+                                    <span id="btnText">Stop</span>
+                                </button></h2>
+                                <div class="card-percentage">
+                                    <small class="last-updated" id="lastUpdated">Last updated: Just now</small>
+                                </div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-code card-icon"></i>
                     </div>
                 </div>
             </div>
@@ -458,7 +735,20 @@
     const allCharges = [];
     const activeCharges = [];
     const activeStates = [];
+    // Script state management
+    const scriptState = {
+        isRunning: `<%= scriptRunFlag %>` === 'true',
+        lastToggleTime: Date.now(),
+        autoUpdateInterval: null,
+        lastUpdate: Date.now()
+    };
+
     $(document).ready(() => {
+        refreshStats();
+        updateScriptCardState(scriptState.isRunning);
+        scriptState.autoUpdateInterval = setInterval(() => {
+            document.getElementById('lastUpdated').textContent = `Last updated: ${formatTimeAgo(scriptState.lastUpdate)}`;
+        }, 1000);
         $.get('/api/charges').done(data => {
             data.forEach(charge => {
                 allCharges.push(charge);
@@ -483,53 +773,6 @@
         loadBatches();
     });
     
-    // Mock data for demonstration
-    const mockBatches = [
-        {
-            id: 1,
-            start_time: '2024-01-15',
-            end_time: '2024-01-20',
-            charges: '["1001", "1002", "1003", "1004"]',
-            states: '["NY", "CA", "TX", "FL"]',
-            status: 'active',
-            script_status: 'processing',
-            processing_charge_id: 1002,
-            processing_state_id: 2,
-            processing_date: '2024-01-15 14:30:00',
-            worker_id: 101,
-            schedule_type: 'dateRange'
-        },
-        {
-            id: 2,
-            start_time: '',
-            end_time: '',
-            charges: '["2001", "2002"]',
-            states: '["IL", "OH"]',
-            status: 'active',
-            script_status: 'completed',
-            processing_charge_id: null,
-            processing_state_id: null,
-            processing_date: '2024-01-14 15:45:00',
-            worker_id: 102,
-            schedule_type: 'everyday'
-        },
-        {
-            id: 3,
-            start_time: '2024-01-10',
-            end_time: '2024-01-16',
-            charges: '["3001", "3002", "3003"]',
-            states: '["WA", "OR"]',
-            status: 'active',
-            script_status: 'pending',
-            processing_charge_id: null,
-            processing_state_id: null,
-            processing_date: null,
-            worker_id: 103,
-            schedule_type: 'dateRange'
-        }
-    ];
-
-
     function loadStats() {
         $.get('/api/batches/stats').done(data => {
             const statsContainer = document.getElementById('statsContainer');
@@ -571,9 +814,10 @@
                     id: batch.id,
                     start_time: batch.start_time,
                     end_time: batch.end_time,
-                    charges: allCharges.filter(state => charges.includes(state.id)).map(state => state.name),
-                    states: allStates.filter(state => states.includes(state.id)).map(state => state.name),
+                    charges: allCharges.filter(charge => charges.includes(charge.id)).map(charge => ({name: charge.name, id: charge.id})),
+                    states: allStates.filter(state => states.includes(state.id)).map(state => ({name: state.name, id: state.id})),
                     status: batch.status,
+                    total_records: batch.total_records,
                     script_status: batch.script_status,
                     processing_charge_id: batch.processing_charge_id,
                     processing_state_id: batch.processing_state_id,
@@ -594,7 +838,6 @@
         batches.forEach((batch, index) => {
             const charges = batch.charges;
             const states = batch.states;
-            const totalRecords = charges.length + states.length;
 
             const batchCard = document.createElement('div');
             batchCard.className = 'batch-card fade-in';
@@ -603,11 +846,13 @@
             batchCard.innerHTML = `
                 <div class="batch-header">
                     <h2 class="batch-id">Batch #${batch.id}</h2>
+                    ${(batch.schedule_type == 'dateRange' && batch.script_status == 'completed') ? `` : `
                     <div class="status-toggle">
                         <div class="toggle-switch ${batch.status}" onclick="toggleStatus(${batch.id}, '${batch.status}')">
                             <div class="toggle-slider"></div>
                         </div>
                     </div>
+                    `}
                 </div>
                 <div class="batch-body">
                     <div class="row">
@@ -618,7 +863,7 @@
                                     States (${states.length})
                                 </div>
                                 <div class="tag-container">
-                                    ${states.map(state => `<span class="tag">${state}</span>`).join('')}
+                                    ${states.map(state => `<span class="tag">${state.name}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -629,7 +874,7 @@
                                     Charges (${charges.length})
                                 </div>
                                 <div class="tag-container">
-                                    ${charges.map(charge => `<span class="tag charge-tag">${charge}</span>`).join('')}
+                                    ${charges.map(charge => `<span class="tag charge-tag">${charge.name}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -638,13 +883,17 @@
                     ${batch.processing_charge_id || batch.processing_state_id ? `
                     <div class="processing-info">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <strong><i class="fas fa-cog me-2"></i>Processing Charge:</strong><br>
-                                ${batch.processing_charge_id || 'None'}
+                                ${batch.processing_charge_id ? (charges.find(item => item.id === batch.processing_charge_id))?.name || 'Unknown' : 'None'}
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <strong><i class="fas fa-location-arrow me-2"></i>Processing State:</strong><br>
-                                ${batch.processing_state_id ? states[batch.processing_state_id - 1] || 'Unknown' : 'None'}
+                                ${batch.processing_state_id ? (states.find(item => item.id === batch.processing_state_id))?.name || 'Unknown' : 'None'}
+                            </div>
+                            <div class="col-md-4">
+                                <strong><i class="fa fa-calendar me-2"></i>Processing Date:</strong><br>
+                                ${batch.processing_date ? new Date(batch.processing_date).toLocaleDateString() : 'Unknown'}
                             </div>
                         </div>
                     </div>
@@ -661,11 +910,11 @@
                         </div>
                         <div class="col-md-3">
                             <strong>Total Records:</strong><br>
-                            <span class="text-primary fw-bold">${totalRecords}</span>
+                            <span class="text-primary fw-bold">${batch.total_records}</span>
                         </div>
                         <div class="col-md-3">
-                            <strong>Started:</strong><br>
-                            ${batch.start_time ? new Date(batch.start_time).toLocaleDateString() : batch.schedule_type === 'everyday' ? 'Everyday' : 'Not started'}
+                            <strong>${batch.schedule_type === 'everyday' ? 'Last Run Date' : 'Date Range'}:</strong><br>
+                            ${batch.schedule_type === 'everyday' ? `${batch.end_time ? new Date(batch.end_time).toLocaleDateString() : ''}` : `${batch.start_time ? new Date(batch.start_time).toLocaleDateString() : ''} ${batch.end_time ? `- ${new Date(batch.end_time).toLocaleDateString()}` : ''}`}
                         </div>
                     </div>
                     
@@ -688,20 +937,24 @@
 
     function toggleStatus(batchId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-        
-        // Find batch and update status
-        const batch = mockBatches.find(b => b.id === batchId);
-        if (batch) {
-            batch.status = newStatus;
-            
-            // Update the toggle switch
-            const toggle = event.target.classList.contains('toggle-switch') ? 
-                          event.target : event.target.parentElement;
-            toggle.className = `toggle-switch ${newStatus}`;
-            
-            // Show success message
-            showToast(`Batch #${batchId} status changed to ${newStatus}`, 'success');
-        }
+        const target = event.target;
+
+        $.ajax({
+            url: `/api/batches/${batchId}`,
+            type: 'PUT',
+            data: { status: newStatus }
+        }).done(data => {
+            if(data.error){
+                showToast(data.error, 'danger');
+            } else {
+                const toggle = target.classList.contains('toggle-switch') ? target : target.parentElement;
+                toggle.className = `toggle-switch ${newStatus}`;
+                $(toggle).attr('onclick', `toggleStatus(${batchId}, '${newStatus}')`);
+                showToast(`Batch #${batchId} status changed to ${newStatus}`, 'success');
+            }
+        }).fail(err => {
+            showToast(err.message, 'danger');
+        });;
     }
 
     function showAddBatchModal() {
@@ -856,33 +1109,97 @@
         }, 3000);
     }
 
+    /*
     $('#toggleBtn').click(function() {
         const btn = $(this);
+        $.get('/toggle-script-flag').done(data => {
+            if(data.flag){
+                btn.data('status', 'started');
+                btn.html('<i class="fas fa-play"></i> Running');
+                btn.removeClass('inactive').addClass('active');
+            } else {
+                btn.data('status', 'stopped');
+                btn.html('<i class="fas fa-stop"></i> Stopped');
+                btn.removeClass('active').addClass('inactive');
+            }
+        }).fail(err => {});
         if (btn.data('status') === 'started') {
-            // Switch to Stop
-            btn.data('status', 'stopped');
-            btn.html('<i class="fas fa-stop"></i> Stopped');
-            btn.removeClass('active').addClass('inactive');
-            // Send start command to server
-            // fetch('/start', { method: 'POST' });
         } else {
-            // Switch to Start
-            btn.data('status', 'started');
-            btn.html('<i class="fas fa-play"></i> Running');
-            btn.removeClass('inactive').addClass('active');
-            // Send stop command to server
-            // fetch('/stop', { method: 'POST' });
         }
     });
+    */
 
+    // Animation function to animate numbers (both increasing and decreasing)
+    function animateNumber(element, start, end, duration) {
+        const range = end - start;
+        const increment = range / (duration / 16);
+        const isIncreasing = end > start;
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            
+            // Check if animation should stop based on direction
+            if (isIncreasing && current >= end) {
+                current = end;
+                clearInterval(timer);
+            } else if (!isIncreasing && current <= end) {
+                current = end;
+                clearInterval(timer);
+            }
+            
+            element.textContent = formatNumber(Math.floor(current));
+        }, 16);
+    }
     // Refresh stats function
     async function refreshStats() {
         try {
             const response = await fetch('/api/stats');
             const data = await response.json();
-            
-            document.getElementById('totalRecords').textContent = data.totalRecords.toLocaleString();
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+            scriptState.lastUpdate = Date.now();
+
+            const dashboardData = {
+                previous: {
+                    totalRecords: parseFormattedNumber(document.getElementById('totalRecords').textContent),
+                    completedRecords: parseFormattedNumber(document.getElementById('completedRecords').textContent),
+                    pendingRecords: parseFormattedNumber(document.getElementById('pendingRecords').textContent)
+                },
+                current: {
+                    totalRecords: data.totalRecords,
+                    completedRecords: data.completedRecords,
+                    pendingRecords: data.pendingRecords
+                }
+            };
+
+            const { previous, current } = dashboardData;
+            // Calculate current percentages
+            let completedPercentage = Math.round((current.completedRecords / current.totalRecords) * 100);
+            let pendingPercentage = Math.round((current.pendingRecords / current.totalRecords) * 100);
+
+            // Calculate previous percentages for smooth transition
+            let prevCompletedPercentage = Math.round((previous.completedRecords / previous.totalRecords) * 100);
+            let prevPendingPercentage = Math.round((previous.pendingRecords / previous.totalRecords) * 100);
+            completedPercentage = isNaN(completedPercentage) ? 100 : completedPercentage;
+            pendingPercentage = isNaN(pendingPercentage) ? 100 : pendingPercentage;
+            prevCompletedPercentage = isNaN(prevCompletedPercentage) ? 100 : prevCompletedPercentage;
+            prevPendingPercentage = isNaN(prevPendingPercentage) ? 100 : prevPendingPercentage;
+             // Animate to new values after delay
+             setTimeout(() => {
+                // Animate numbers from previous to current
+                animateNumber(document.getElementById('totalRecords'), previous.totalRecords, current.totalRecords, 2000);
+                animateNumber(document.getElementById('completedRecords'), previous.completedRecords, current.completedRecords, 2000);
+                animateNumber(document.getElementById('pendingRecords'), previous.pendingRecords, current.pendingRecords, 2000);
+                
+                // Animate percentages
+                animateNumber(document.getElementById('completedPercentage'), prevCompletedPercentage, completedPercentage, 2000);
+                animateNumber(document.getElementById('pendingPercentage'), prevPendingPercentage, pendingPercentage, 2000);
+                
+                // Animate progress bars
+                setTimeout(() => {
+                    document.getElementById('completedBar').style.width = completedPercentage + '%';
+                    document.getElementById('pendingBar').style.width = pendingPercentage + '%';
+                }, 500);
+            }, 600);
         } catch (error) {
             console.error('Error refreshing stats:', error);
         }
@@ -890,7 +1207,170 @@
     }
 
     // Auto-refresh stats every 30 seconds
-    setInterval(refreshStats, 30000);
+    setInterval(refreshStats, 60 * 1000 * 3);
+
+    // Update script card visual state
+    function updateScriptCardState(isRunning) {
+        const scriptCard = document.getElementById('scriptCard');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = toggleBtn.querySelector('i');
+        
+        if (isRunning) {
+            // Running state
+            scriptCard.className = 'card stats-card script-control-card card-script';
+            statusIndicator.className = 'status-indicator running';
+            statusText.textContent = 'Running';
+            btnIcon.className = 'fas fa-stop me-1';
+            btnText.textContent = 'Stop';
+        } else {
+            // Stopped state
+            scriptCard.className = 'card stats-card script-control-card card-script stopped';
+            statusIndicator.className = 'status-indicator stopped';
+            statusText.textContent = 'Stopped';
+            btnIcon.className = 'fas fa-play me-1';
+            btnText.textContent = 'Start';
+        }
+    }
+    
+    // Toggle script function
+    function toggleScript() {
+        const toggleBtn = document.getElementById('toggleBtn');
+        
+        // Prevent rapid clicking
+        const now = Date.now();
+        if (now - scriptState.lastToggleTime < 1000) {
+            // Add shake animation for rapid clicks
+            toggleBtn.classList.add('shake');
+            setTimeout(() => toggleBtn.classList.remove('shake'), 500);
+            return;
+        }
+        
+        // Disable button temporarily
+        toggleBtn.disabled = true;
+
+        $.get('/toggle-script-flag').done(data => {
+            // Toggle state
+            scriptState.isRunning = data.flag;
+            scriptState.lastToggleTime = new Date();
+            setTimeout(() => {
+                updateScriptCardState(scriptState.isRunning);
+                // Re-enable button
+                toggleBtn.disabled = false;
+                // Show feedback
+                showToggleFeedback(scriptState.isRunning);
+            }, 300);
+        }).fail(err => {});
+    }
+    
+    // Show toggle feedback
+    function showToggleFeedback(isRunning) {
+        const statusText = document.getElementById('statusText');
+        const originalText = statusText.textContent;
+        
+        // Briefly show action feedback
+        statusText.textContent = isRunning ? 'Starting...' : 'Stopping...';
+        
+        setTimeout(() => {
+            statusText.textContent = originalText;
+        }, 1000);
+    }
+
+    // Format numbers with K/M suffixes - maximum 5-6 digits
+    function formatNumber(num) {
+        if (num >= 1000000000) {
+            // For billions
+            const billions = num / 1000000000;
+            if (billions >= 1000) {
+                // For trillions, show as 1.234T
+                const trillions = billions / 1000;
+                return trillions.toFixed(3).replace(/\.?0+$/, '') + 'T';
+            } else if (billions >= 100) {
+                // For 100B+, show as 123.45B (5-6 digits)
+                return billions.toFixed(2).replace(/\.?0+$/, '') + 'B';
+            } else if (billions >= 10) {
+                // For 10B-99.9B, show as 12.345B (5-6 digits)
+                return billions.toFixed(3).replace(/\.?0+$/, '') + 'B';
+            } else {
+                // For 1B-9.99B, show as 1.2345B (5-6 digits)
+                return billions.toFixed(4).replace(/\.?0+$/, '') + 'B';
+            }
+        } else if (num >= 1000000) {
+            // For millions
+            const millions = num / 1000000;
+            if (millions >= 100) {
+                // For 100M+, show as 123.45M (5-6 digits)
+                return millions.toFixed(2).replace(/\.?0+$/, '') + 'M';
+            } else if (millions >= 10) {
+                // For 10M-99.9M, show as 12.345M (5-6 digits)
+                return millions.toFixed(3).replace(/\.?0+$/, '') + 'M';
+            } else {
+                // For 1M-9.99M, show as 1.2345M (5-6 digits)
+                return millions.toFixed(4).replace(/\.?0+$/, '') + 'M';
+            }
+        } else if (num >= 100000) {
+            // For 100K-999K, show as 123.45K (5-6 digits)
+            const thousands = num / 1000;
+            return thousands.toFixed(2).replace(/\.?0+$/, '') + 'K';
+        } else if (num >= 10000) {
+            // For 10K-99.9K, show as 12.345K (5-6 digits)
+            const thousands = num / 1000;
+            return thousands.toFixed(3).replace(/\.?0+$/, '') + 'K';
+        } else {
+            // For numbers < 1000, show as-is with commas
+            return num.toLocaleString();
+        }
+    }
+
+    // Format time ago
+    function formatTimeAgo(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(diff / (1000 * 60));
+        
+        if (minutes < 1) {
+            if(seconds < 2){
+                return 'Just now';
+            } else {
+                return `${seconds} seconds ago`;
+            }
+        }
+        if (minutes === 1) return '1 minute ago';
+        if (minutes < 60) return `${minutes} minutes ago`;
+        
+        const hours = Math.floor(minutes / 60);
+        if (hours === 1) return '1 hour ago';
+        if (hours < 24) return `${hours} hours ago`;
+        
+        const days = Math.floor(hours / 24);
+        if (days === 1) return '1 day ago';
+        return `${days} days ago`;
+    }
+
+    // Parse formatted numbers back to integers
+    function parseFormattedNumber(formattedStr) {
+        if (formattedStr.includes('T')) {
+            return parseFloat(formattedStr.replace('T', '')) * 1000000000000;
+        } else if (formattedStr.includes('B')) {
+            return parseFloat(formattedStr.replace('B', '')) * 1000000000;
+        } else if (formattedStr.includes('M')) {
+            return parseFloat(formattedStr.replace('M', '')) * 1000000;
+        } else if (formattedStr.includes('K')) {
+            return parseFloat(formattedStr.replace('K', '')) * 1000;
+        } else {
+            return parseInt(formattedStr.replace(/,/g, ''));
+        }
+    }
+    
+    // Cleanup intervals when page unloads
+    window.addEventListener('beforeunload', function() {
+        if (scriptState.autoUpdateInterval) {
+            clearInterval(scriptState.autoUpdateInterval);
+        }
+    });
 
 </script>
 </body>

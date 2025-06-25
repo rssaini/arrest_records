@@ -47,6 +47,11 @@ const gotoPage = async(page, url) => {
     try{
         return await page.goto(url, { waitUntil: "domcontentloaded" });
     }catch(err){
+        console.log(err);
+        if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+            console.log('Page or browser was closed unexpectedly.');
+            process.exit();
+        }
         return await gotoPage(page, url);
     }
 };
@@ -67,6 +72,11 @@ const waitUntil = async page => {
                 await sleep(2000);
             }
         }catch(err){
+            console.log(err);
+            if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+                console.log('Page or browser was closed unexpectedly.');
+                process.exit();
+            }
             console.log('waiting for page load and verification clear');
             await sleep(2000);
         }
@@ -111,6 +121,11 @@ const getCriminalData = async(page) => {
             return criminals;
         });
     }catch(err){
+        console.log(err);
+        if (err.message.includes('Target closed') || err.message.includes('Session closed') || err.message.includes('Attempted to use detached Frame')) {
+            console.log('Page or browser was closed unexpectedly.');
+            process.exit();
+        }
         return await getCriminalData(page);
     }
 };
@@ -196,6 +211,10 @@ async function test(start_date, end_date, ids) {
         plugins: [pxp()],
     });
     let startDate = start_date;
+    if(batchData.processing_date !== null && batchData.processing_date !== ''){
+        startDate = batchData.processing_date;
+        batchData.processing_date = null;
+    }
     while(true){
         const endDate = incrementDate(startDate);
         if(end_date === startDate){
@@ -227,7 +246,7 @@ async function loopTest() {
     }
     const charges = JSON.parse(batchData.charges);
     const states = JSON.parse(batchData.states);
-    const combination = [];
+    let combination = [];
 
     states.forEach(state => {
         charges.forEach(charge => {
@@ -237,6 +256,19 @@ async function loopTest() {
             });
         });
     });
+    if(batchData.processing_charge_id !== null && batchData.processing_state_id !== null){
+        let index = null;
+        combination.forEach((item, ind) => {
+            if(item.state_id == batchData.processing_state_id && item.charge_id === batchData.processing_charge_id){
+                index = ind;
+            }
+        });
+        if(index){
+            combination = combination.slice(index);
+            batchData.processing_charge_id = null;
+            batchData.processing_state_id = null;
+        }
+    }
 
     for(const ids of combination){
         await test(formatDate(batchData.start_time), formatDate(batchData.end_time), ids);
@@ -263,6 +295,7 @@ async function getData(){
             const data = response.data;
             if(data == '' || data == undefined){
                 setTimeout(getData, 5000);
+                return;
             }
             batchData = data;
             axios.put(`${base_url}api/batches/${data.id}`, {
@@ -297,5 +330,7 @@ axios.get(`${base_url}api/states`).then(response => {
         getData();
     }).catch(error => {}).finally(() => {});
 }).catch(error => {}).finally(() => {});
+
+console.log("Background Script Started");
 
 // p Verify you are human by completing the action below.
