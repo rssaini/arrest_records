@@ -3,17 +3,89 @@ const path = require('path');
 const cron = require('node-cron');
 const { spawn } = require('child_process');
 const db = require('./database/db');
+let scheduledJob = null;
 
-cron.schedule('30 10 * * *', () => {
-    console.log('Cron Running at 10:30 AM daily');
-    const everyday = spawn('node', [path.join(__dirname, 'everyday.js')], {
-        stdio: 'inherit' // to see output in console
+const initializeCron = async () => {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT value FROM settings WHERE name = ?", ['cron_schedule'], (err, row) => {
+            if (err) {
+                console.error("Database error while fetching cron schedule:", err);
+                reject(err);
+                return;
+            }
+            
+            if (!row || !row.value) {
+                console.log("No cron schedule found in settings");
+                resolve(false);
+                return;
+            }
+
+            // Stop and cleanup existing scheduled job
+            console.log("Schedule Job: ", scheduledJob);
+            if (scheduledJob !== null) {
+                try { 
+                    scheduledJob.stop(); 
+                    console.log("Stopped existing cron job");
+                } catch (err) {
+                    console.warn("Error stopping scheduled job:", err);
+                }
+                
+                try { 
+                    scheduledJob.destroy(); 
+                } catch (err) {
+                    console.warn("Error destroying scheduled job:", err);
+                } finally { 
+                    scheduledJob = null;
+                }
+            }
+
+            try {
+                console.log(`Scheduling new cron job with pattern: ${row.value}`);
+                const cronPattern = row.value;
+                const cronParts = row.value.split(' ');
+                if (cronParts.length >= 2) {
+                    const minutes = parseInt(cronParts[0], 10);
+                    const hours = parseInt(cronParts[1], 10);
+                    let timeStr;
+                    if (hours === 0) {
+                        timeStr = `12:${String(minutes).padStart(2, '0')} AM`;
+                    } else if (hours < 12) {
+                        timeStr = `${hours}:${String(minutes).padStart(2, '0')} AM`;
+                    } else if (hours === 12) {
+                        timeStr = `12:${String(minutes).padStart(2, '0')} PM`;
+                    } else {
+                        timeStr = `${hours - 12}:${String(minutes).padStart(2, '0')} PM`;
+                    }
+                    console.log(`Cron running at ${timeStr} daily`);
+                }
+                scheduledJob = cron.schedule(cronPattern, () => {
+                    console.log('Everyday script started');
+                    // Spawn the everyday script
+                    const everyday = spawn('node', [path.join(__dirname, 'everyday.js')], {
+                        stdio: 'inherit'
+                    });
+                    
+                    everyday.on('error', (error) => {
+                        console.error('Failed to start everyday script:', error);
+                    });
+                    
+                    everyday.on('exit', (code, signal) => {
+                        if (code === 0) {
+                            console.log('Everyday script completed successfully');
+                        } else {
+                            console.log(`Everyday script exited with code ${code} and signal ${signal}`);
+                        }
+                    });
+                });
+                resolve(true);
+                
+            } catch (error) {
+                console.error("Error scheduling cron job:", error);
+                reject(error);
+            }
+        });
     });
-    
-    everyday.on('exit', (code, signal) => {
-        console.log(`Everyday script exited with code ${code} and signal ${signal}`);
-    });
-});
+};
 
 let backgroundScriptProcess = null;
 let bgScriptProcess = null;
@@ -88,6 +160,49 @@ app.get('/toggle-script-flag', async (req, res) => {
     }
 });
 
+app.get('/api/settings', async (req, res) => {
+    try {
+        let query = "SELECT * FROM settings";
+        db.all(query, [], (err, rows) => {
+            if (err) {
+                return res.status(500).json({ 
+                    error: 'Database error', 
+                    details: err.message 
+                });
+            }
+            const settings = {};
+            rows.forEach(setting => {
+                settings[setting.name] = setting.value;
+            });
+            res.json(settings);
+        });
+    } catch (error) {
+        res.status(500).send('Error loading records: ' + error.message);
+    }
+});
+
+function runAsync(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.run(sql, params, function(err) {
+        if (err) reject(err);
+        else resolve(this); // 'this' contains info like lastID, changes
+        });
+    });
+}
+app.post('/api/settings', async (req, res) => {
+    try {
+        const out = await runAsync('UPDATE settings SET value = ? WHERE name = ?', [req.body.cronSchedule, "cron_schedule"]);
+        if(out.changes !== 0){
+            initializeCron();
+        }
+        await runAsync('UPDATE settings SET value = ? WHERE name = ?', [JSON.stringify(req.body.names), "fta_names"]);
+
+        res.json({ status: "success", body: req.body});
+    } catch (error) {
+        res.status(500).send('Error loading records: ' + error.message);
+    }
+});
+
 // Dashboard Page
 app.get('/', async (req, res) => {
     try {
@@ -113,5 +228,15 @@ process.on('SIGINT', () => {
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log('Cron Running at 10:30 AM daily');
+    initializeCron()
+    .then(success => {
+        if (success) {
+            console.log("Cron initialization completed");
+        } else {
+            console.log("No cron schedule to initialize");
+        }
+    })
+    .catch(error => {
+        console.error("Failed to initialize cron:", error);
+    });
 });

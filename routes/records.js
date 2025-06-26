@@ -78,8 +78,10 @@ router.get('/records', async (req, res) => {
         
         // Build query based on filters
         let query = `
-            SELECT r.*, c.name as county_name, a.name as agency_name, s.name as state_name
+            SELECT r.*, c.name as county_name, a.name as agency_name, s.name as state_name,
+            GROUP_CONCAT(rc.name, ', ') AS charges_names
             FROM records r
+            LEFT JOIN record_charges rc ON r.id = rc.record_id
             LEFT JOIN county c ON r.county_id = c.id
             LEFT JOIN agency a ON r.agency_id = a.id
             LEFT JOIN states s ON r.state_id = s.id
@@ -126,7 +128,7 @@ router.get('/records', async (req, res) => {
             params.push(req.query.fta_status);
         }
         
-        query += ' ORDER BY r.arrest_datetime DESC LIMIT 1500';
+        query += ' GROUP BY r.id ORDER BY r.arrest_datetime DESC LIMIT 1500';
         
         const records = await new Promise((resolve, reject) => {
             db.all(query, params, (err, rows) => {
@@ -169,8 +171,10 @@ router.get('/export-csv', async (req, res) => {
         
         // Same query logic as records page
         let query = `
-            SELECT r.*, c.name as county_name, a.name as agency_name, s.name as state_name
+            SELECT r.*, c.name as county_name, a.name as agency_name, s.name as state_name,
+            GROUP_CONCAT(rc.name, ', ') AS charges_names
             FROM records r
+            LEFT JOIN record_charges rc ON r.id = rc.record_id
             LEFT JOIN county c ON r.county_id = c.id
             LEFT JOIN agency a ON r.agency_id = a.id
             LEFT JOIN states s ON r.state_id = s.id
@@ -213,7 +217,7 @@ router.get('/export-csv', async (req, res) => {
             params.push(req.query.fta_status);
         }
         
-        query += ' ORDER BY r.arrest_datetime DESC';
+        query += ' GROUP BY r.id ORDER BY r.arrest_datetime DESC';
         
         const records = await new Promise((resolve, reject) => {
             db.all(query, params, (err, rows) => {
@@ -235,7 +239,8 @@ router.get('/export-csv', async (req, res) => {
                                 county: row.county_name,
                                 agency: row.agency_name,
                                 state: row.state_name,
-                                charges: chargeNames,
+                                charge: chargeNames,
+                                charges: row.charges_names,
                                 url: row.url
                             };
                         } catch (e) {
@@ -246,7 +251,8 @@ router.get('/export-csv', async (req, res) => {
                                 county: row.county_name,
                                 agency: row.agency_name,
                                 state: row.state_name,
-                                charges: '',
+                                charge: '',
+                                charges: row.charges_names,
                                 url: row.url
                             };
                         }

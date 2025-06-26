@@ -504,6 +504,210 @@
             color: white;
         }
     </style>
+    <style>
+        .configuration .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .configuration .form-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .configuration .form-group {
+            margin-bottom: 25px;
+        }
+
+        .configuration .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .configuration .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .configuration .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .configuration .time-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .configuration .repeater-section {
+            border: 2px dashed #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .configuration .repeater-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .configuration .name-field-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .configuration .name-field-group:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .configuration .name-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .configuration .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .configuration .btn-add {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .configuration .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .configuration .btn-remove {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .configuration .btn-remove:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+        }
+
+        .configuration .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .configuration .btn-cancel {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .configuration .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .configuration .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            flex: 2;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .configuration .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .configuration .field-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .configuration .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .configuration .name-field-group {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -616,7 +820,11 @@
     <div class="container">
         <!-- Search and Controls -->
         <div class="row mb-4">
-            <div class="col-md-6 text-end"></div>
+            <div class="col-md-6 text-start">
+                <button class="btn btn-custom" onclick="showConfigurationModal()">
+                    <i class="fas fa-cog me-2"></i>Configuration
+                </button>
+            </div>
             <div class="col-md-6 text-end">
                 <button class="btn btn-custom me-2" onclick="loadBatches()">
                     <i class="fas fa-sync-alt me-2"></i>Refresh
@@ -723,6 +931,65 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-custom" onclick="addBatch()">Add Batch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Batch Modal -->
+    <div class="modal fade" id="configurationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="configuration">
+                    <div class="form-container">
+                        <h1 class="form-title">Schedule Configuration</h1>
+                        
+                        <form id="cronForm">
+                            <!-- Time Field -->
+                            <div class="form-group">
+                                <label for="scheduleTime" class="form-label">Schedule Cron Time</label>
+                                <input 
+                                    type="time" 
+                                    id="scheduleTime" 
+                                    name="scheduleTime" 
+                                    class="form-input"
+                                    value="00:00"
+                                    required
+                                >
+                                <div class="time-help">
+                                    Select the time when the schedule should run daily
+                                </div>
+                                <input type="hidden" id="cronSchedule" name="cronSchedule" value="30 10 * * *">
+                            </div>
+                
+                            <!-- Name Fields Repeater -->
+                            <div class="form-group">
+                                <label class="form-label">FTA Fields</label>
+                                <div class="repeater-section">
+                                    <div class="repeater-header">
+                                        <button type="button" class="btn btn-add" onclick="addNameField()">
+                                            + Add FTA Field
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="nameFields">
+                                        <div class="empty-state" id="emptyState">
+                                            No FTA fields added yet. Click "Add Fta Field" to get started.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-cancel" onclick="cancelConfigurationForm()">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-submit">
+                                    Save Configuration
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -959,6 +1226,10 @@
 
     function showAddBatchModal() {
         const modal = new bootstrap.Modal(document.getElementById('addBatchModal'));
+        modal.show();
+    }
+    function showConfigurationModal() {
+        const modal = new bootstrap.Modal(document.getElementById('configurationModal'));
         modal.show();
     }
 
@@ -1373,5 +1644,6 @@
     });
 
 </script>
+<script src="/configuration.js"></script>
 </body>
 </html>
