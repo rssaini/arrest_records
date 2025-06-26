@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS record_charges (
     notes TEXT DEFAULT NULL,
     record_id INTEGER DEFAULT NULL,
     FOREIGN KEY (record_id) REFERENCES records(id),
-    CONSTRAINT unique_record_id_name UNIQUE (record_id, name),
+    CONSTRAINT unique_record_id_name UNIQUE (record_id, name)
 );
 
 -- Create indexes for better performance
