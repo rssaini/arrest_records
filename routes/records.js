@@ -121,6 +121,10 @@ router.get('/records', async (req, res) => {
             query += ' AND r.state_id = ?';
             params.push(req.query.state_id);
         }
+        if (req.query.fta_status) {
+            query += ' AND r.fta_status = ?';
+            params.push(req.query.fta_status);
+        }
         
         query += ' ORDER BY r.arrest_datetime DESC LIMIT 1500';
         
@@ -199,6 +203,14 @@ router.get('/export-csv', async (req, res) => {
         if (req.query.charge_id) {
             query += ' AND r.charges = ?';
             params.push('[' + req.query.charge_id + ']');
+        }
+        if (req.query.state_id) {
+            query += ' AND r.state_id = ?';
+            params.push(req.query.state_id);
+        }
+        if (req.query.fta_status) {
+            query += ' AND r.fta_status = ?';
+            params.push(req.query.fta_status);
         }
         
         query += ' ORDER BY r.arrest_datetime DESC';

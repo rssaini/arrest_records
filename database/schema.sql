@@ -7,11 +7,13 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- Insert initial settings
-INSERT OR IGNORE INTO settings (name, value) VALUES 
-('fetch_until', ''),
-('processing_date', ''),
-('headless', 'false'),
-('fetched_until', '');
+INSERT OR IGNORE INTO settings (name, value) VALUES
+('cron_schedule', '30 10 * * *'),
+('background_worker_count', '1'),
+('bg_worker_count', '1'),
+('everyday_worker_count', '1'),
+('fta_names', '["FTA", "FAIL TO APPEAR", "FAILURE TO APPEAR"]'),
+('headless', 'false');
 
 -- States Table
 CREATE TABLE IF NOT EXISTS states (
@@ -147,10 +149,23 @@ CREATE TABLE IF NOT EXISTS records (
     batch_id INTEGER NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    worker_id INTEGER DEFAULT NULL,
+    fta_status INTEGER DEFAULT 0,
     FOREIGN KEY (agency_id) REFERENCES agency(id),
     FOREIGN KEY (county_id) REFERENCES county(id),
     FOREIGN KEY (state_id) REFERENCES states(id),
     FOREIGN KEY (batch_id) REFERENCES batch(id)
+);
+-- Records Charges Detail Table
+CREATE TABLE IF NOT EXISTS record_charges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT DEFAULT NULL,
+    statute TEXT DEFAULT NULL,
+    bond TEXT DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    record_id INTEGER DEFAULT NULL,
+    FOREIGN KEY (record_id) REFERENCES records(id),
+    CONSTRAINT unique_record_id_name UNIQUE (record_id, name),
 );
 
 -- Create indexes for better performance
@@ -159,3 +174,7 @@ CREATE INDEX IF NOT EXISTS idx_records_agency_id ON records(agency_id);
 CREATE INDEX IF NOT EXISTS idx_records_county_id ON records(county_id);
 CREATE INDEX IF NOT EXISTS idx_records_state_id ON records(state_id);
 CREATE INDEX IF NOT EXISTS idx_records_batch_id ON records(batch_id);
+CREATE INDEX IF NOT EXISTS idx_records_status ON records(status);
+CREATE INDEX IF NOT EXISTS idx_records_fta_status ON records(fta_status);
+CREATE INDEX IF NOT EXISTS idx_records_worker_id ON records(worker_id);
+CREATE INDEX IF NOT EXISTS idx_record_charges_record_id ON record_charges(record_id);

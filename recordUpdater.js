@@ -3,9 +3,41 @@ const path = require('path');
 
 class RecordUpdater {
     constructor(dbPath) {
+        this.name_array = [];
         this.dbPath = dbPath || path.join(__dirname, 'arrest_records.db');
         this.db = new sqlite3.Database(this.dbPath);
+        this.initialized = false;
     }
+    async initialize() {
+        return new Promise((resolve, reject) => {
+            this.db.get("SELECT value FROM settings WHERE name = ?", ['fta_names'], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (row) {
+                    resolve(JSON.parse(row.value));
+                } else {
+                    reject("Error in settings table");
+                }
+            });
+        });
+    }
+
+    containsAnyWholeWord(str, needles) {
+        return needles.some(needle => {
+            const escapedNeedle = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape special regex characters
+            const regex = new RegExp(`\\b${escapedNeedle}\\b`, 'i'); // match whole word
+            // For multi-word phrases, you might want to match them directly:
+            if (needle.trim().includes(' ')) {
+              // Match phrase anywhere
+              return new RegExp(escapedNeedle, 'i').test(str);
+            } else {
+              // Match single word
+              return regex.test(str);
+            }
+          });
+      }
 
     // Insert a new record
     async insertRecord(recordData) {
@@ -55,19 +87,92 @@ class RecordUpdater {
         });
     }
 
+    async insertCharges(record_id, charge) {
+        return new Promise((resolve, reject) => {
+            const {
+                title,
+                statute,
+                bond,
+                notes
+            } = charge;
+
+            const fields = [];
+            const params = [];
+
+            if(record_id){
+                fields.push("record_id");
+                params.push(record_id);
+            }
+
+            if(title){
+                fields.push("name");
+                params.push(title);
+            }
+            if(statute){
+                fields.push("statute");
+                params.push(statute);
+            }
+            if(bond){
+                fields.push("bond");
+                params.push(bond);
+            }
+            if(notes){
+                fields.push("notes");
+                params.push(notes);
+            }
+
+            const sql = `INSERT INTO record_charges (${fields.join(',')}) VALUES (${fields.map(() => '?').join(', ')})`;
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ inserted: true });
+                }
+            });
+        });
+    }
+
     // Update record
     async updateRecord(recordData) {
+        if(!this.initialized){
+            try{
+                this.name_array = await this.initialize();
+                this.initialized = true;
+            } catch(err){
+            }
+        }
         let agency_id = null;
         if (recordData.agency_name !== undefined && recordData.agency_name !== '' && recordData.agency_name !== null) {
             agency_id = await this.getOrCreateAgency(recordData.agency_name);
+        }
+        for(const charge of recordData.charges){
+            try{
+                await this.insertCharges(recordData.id, charge);
+            }catch(err){
+                console.log("Error while inserting charges: ", err);
+            }
         }
         return new Promise((resolve, reject) => {
             const {
                 id,
                 name,
                 arrest_datetime,
-                status
+                status,
+                charges
             } = recordData;
+            let fta_status = false;
+            charges.forEach(charge => {
+                if(charge.title && charge.title !== '' && charge.title !== undefined){
+                    if(!fta_status){
+                        fta_status = this.containsAnyWholeWord(charge.title, this.name_array);
+                    }
+                }
+            });
+            if(fta_status == true){
+                fta_status = 1;
+            } else {
+                fta_status = 0;
+            }
 
             const updates = [];
             const params = [];
@@ -75,6 +180,10 @@ class RecordUpdater {
             if (name !== undefined) {
                 updates.push('name = ?');
                 params.push(name);
+            }
+            if (fta_status !== undefined) {
+                updates.push('fta_status = ?');
+                params.push(fta_status);
             }
             if (arrest_datetime !== undefined && arrest_datetime !== null) {
                 updates.push('arrest_datetime = ?');

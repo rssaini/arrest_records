@@ -114,6 +114,26 @@ const getInfo = async(page) => {
                   break;
               }
             });
+            const charges = [];
+            const sections = document.querySelectorAll('div.section-content.charges');
+            if(sections.length > 0){
+                const lis = sections[0].querySelectorAll('ul > li');
+                lis.forEach(function(li){
+                    const charge = { title: ''};
+                    if(li.querySelectorAll('.charge-title')[0]){
+                        charge.title = li.querySelectorAll('.charge-title')[0].innerText;
+                    }
+                    const ptags = li.querySelectorAll('.charge-description > p');
+                    ptags.forEach(function(p){
+                        const arr = p.innerText.split(':');
+                        if(arr.length > 1){
+                            charge[arr[0].replace(/\s+/g, '').toLowerCase()] = (arr.slice(1)).join(':');
+                        }
+                    });
+                    charges.push(charge);
+                });
+            }
+            result.charges = charges;
             return result;
         });
         return info;
@@ -137,7 +157,8 @@ const criminalData = async(page, url, recordId) => {
             status: "completed",
             name: info.name,
             arrest_datetime: formatDate(info.date, info.time),
-            agency_name: info.agency
+            agency_name: info.agency,
+            charges: info.charges
         });
     } catch (error) {
         console.error('Error processing record:', error.message);

@@ -97,15 +97,11 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label for="agency_id" class="form-label">Agency</label>
-                        <select class="form-select" id="agency_id" name="agency_id">
-                            <option value="">All Agencies</option>
-                            <% referenceData.agencies.forEach(agency => { %>
-                                <option value="<%= agency.id %>" 
-                                        <%= filters.agency_id == agency.id ? 'selected' : '' %>>
-                                    <%= agency.name %>
-                                </option>
-                            <% }) %>
+                        <label for="fta_status" class="form-label">FTA Status</label>
+                        <select class="form-select" id="fta_status" name="fta_status">
+                            <option value="">All </option>
+                            <option <%= filters.fta_status == "1" ? 'selected' : '' %> value="1">True</option>
+                            <option <%= filters.fta_status == "0" ? 'selected' : '' %> value="0">False</option>
                         </select>
                     </div>
                     <div class="col-md-2">
