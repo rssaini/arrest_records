@@ -235,7 +235,7 @@ router.get('/export-csv', async (req, res) => {
                             return {
                                 id: row.id,
                                 name: row.name,
-                                arrest_datetime: row.arrest_datetime,
+                                arrest_datetime: row.arrest_datetime ? new Date(row.arrest_datetime).toLocaleString() : '',
                                 county: row.county_name,
                                 agency: row.agency_name,
                                 state: row.state_name,
@@ -247,7 +247,7 @@ router.get('/export-csv', async (req, res) => {
                             return {
                                 id: row.id,
                                 name: row.name,
-                                arrest_datetime: row.arrest_datetime,
+                                arrest_datetime: row.arrest_datetime ? new Date(row.arrest_datetime).toLocaleString() : '',
                                 county: row.county_name,
                                 agency: row.agency_name,
                                 state: row.state_name,
